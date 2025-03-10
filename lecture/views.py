@@ -155,7 +155,7 @@ class CreateLectureView(LoginRequiredMixin, CreateView):
     form_class = LectureForm
     template_name = "lecture/create_lecture.html"
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs):
         super().__init__(kwargs)
         self.module = get_object_or_404(Module, id=self.kwargs["module_id"])
         self.course = get_object_or_404(Course, slug=self.kwargs["course_slug"])
@@ -188,7 +188,7 @@ class CreateLectureView(LoginRequiredMixin, CreateView):
 class CreateContentView(LoginRequiredMixin, FormView):
     template_name = "lecture/create_content.html"
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs):
         super().__init__(kwargs)
         self.lecture = get_object_or_404(Lecture, slug=self.kwargs["lecture_slug"])
 
@@ -262,7 +262,7 @@ class CreateModuleView(LoginRequiredMixin, CreateView):
     form_class = ModuleForm
     template_name = "lecture/create_module.html"
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs):
         super().__init__(kwargs)
         self.course = get_object_or_404(Course, slug=self.kwargs["course_slug"])
 
