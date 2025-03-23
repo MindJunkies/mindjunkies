@@ -8,30 +8,30 @@ from config.models import BaseModel
 
 
 class UserManager(BaseUserManager):
-    """Custom user manager with support for emails as unique identifiers."""
+    """Custom user manager using email as a unique identifier."""
 
-    @classmethod
-    def normalize_email(cls, email):
-        return super().normalize_email(email)
-
-    def create_user(self, username, email, password=None, **extra_fields):
-        """Creates and returns a regular user with the given details."""
-        user = self.model(username=username, email=self.normalize_email(email), **extra_fields)
+    def _create_user(self, username, email, password, **extra_fields):
+        """Helper method for creating users."""
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
+    def create_user(self, username, email, password=None, **extra_fields):
+        """Creates a regular user."""
+        return self._create_user(username, email, password, **extra_fields)
+
     def create_superuser(self, username, email, password=None, **extra_fields):
-        """Creates and returns a superuser with admin privileges."""
+        """Creates a superuser."""
         extra_fields.update({"is_staff": True, "is_superuser": True})
-        return self.create_user(username, email, password, **extra_fields)
+        return self._create_user(username, email, password, **extra_fields)
 
 
 class User(AbstractUser):
     """Custom User model with UUID primary key."""
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     REQUIRED_FIELDS = ["email", "first_name", "last_name"]
 
     objects = UserManager()
