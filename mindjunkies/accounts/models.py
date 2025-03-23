@@ -1,7 +1,6 @@
 import uuid
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from django.contrib.auth import get_user_model
 from cloudinary.models import CloudinaryField
 
 from config.models import BaseModel
@@ -11,22 +10,18 @@ class UserManager(BaseUserManager):
     """Custom user manager using email as a unique identifier."""
 
     def create_user(self, username, email, password=None, **extra_fields):
-        """Creates a regular user."""
-        extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
-        return self._create(username, email, password, **extra_fields)
-
-    def create_superuser(self, username, email, password=None, **extra_fields):
-        """Creates a superuser."""
-        extra_fields.update({"is_staff": True, "is_superuser": True})
-        return self._create(username, email, password, **extra_fields)
-
-    def _create(self, username, email, password, **extra_fields):
-        """Handles user creation with normalized email and password hashing."""
-        user = self.model(username=username, email=self.normalize_email(email), **extra_fields)
+        """Creates and returns a regular user."""
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
+
+    def create_superuser(self, username, email, password=None, **extra_fields):
+        """Creates and returns a superuser."""
+        extra_fields["is_staff"] = True
+        extra_fields["is_superuser"] = True
+        return self.create_user(username, email, password, **extra_fields)
 
 
 class User(AbstractUser):
@@ -47,7 +42,7 @@ class User(AbstractUser):
 class Profile(BaseModel):
     """User profile model storing additional user details."""
 
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     birthday = models.DateField(null=True, blank=True)
     bio = models.TextField(blank=True)
     avatar = CloudinaryField(folder="avatars", overwrite=True, resource_type="image", null=True, blank=True)
