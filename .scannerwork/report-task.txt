@@ -2,5 +2,5 @@ projectKey=MindJunkies
 serverUrl=http://127.0.0.1:9000
 serverVersion=25.3.0.104237
 dashboardUrl=http://127.0.0.1:9000/dashboard?id=MindJunkies
-ceTaskId=3c743af4-f99b-4cd9-9940-6e9ece744241
-ceTaskUrl=http://127.0.0.1:9000/api/ce/task?id=3c743af4-f99b-4cd9-9940-6e9ece744241
+ceTaskId=b2754663-8cff-4b7b-b7c1-cc76d26b35c1
+ceTaskUrl=http://127.0.0.1:9000/api/ce/task?id=b2754663-8cff-4b7b-b7c1-cc76d26b35c1

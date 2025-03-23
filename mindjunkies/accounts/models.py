@@ -10,22 +10,23 @@ from config.models import BaseModel
 class UserManager(BaseUserManager):
     """Custom user manager using email as a unique identifier."""
 
-    def _create_user(self, username, email, password, **extra_fields):
-        """Helper method for creating users."""
-        email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
     def create_user(self, username, email, password=None, **extra_fields):
         """Creates a regular user."""
-        return self._create_user(username, email, password, **extra_fields)
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self._create(username, email, password, **extra_fields)
 
     def create_superuser(self, username, email, password=None, **extra_fields):
         """Creates a superuser."""
         extra_fields.update({"is_staff": True, "is_superuser": True})
-        return self._create_user(username, email, password, **extra_fields)
+        return self._create(username, email, password, **extra_fields)
+
+    def _create(self, username, email, password, **extra_fields):
+        """Handles user creation with normalized email and password hashing."""
+        user = self.model(username=username, email=self.normalize_email(email), **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
 
 class User(AbstractUser):
@@ -33,7 +34,6 @@ class User(AbstractUser):
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     REQUIRED_FIELDS = ["email", "first_name", "last_name"]
-
     objects = UserManager()
 
     def __str__(self):
